@@ -1,5 +1,9 @@
 {
   "name": "MarkPDF Pro",
-  "description": "A professional Markdown to HTML converter with PDF export capabilities. featuring real-time preview and document-styled formatting.",
+  "short_name": "MarkPDF",
+  "description": "Free online Markdown to PDF converter with real-time live preview, dark mode, and mobile-friendly responsive design. Convert MD to PDF instantly. 100% private - works offline in your browser. No signup required.",
+  "keywords": "markdown to pdf, markdown editor, pdf converter, free pdf generator, online markdown editor, md to pdf, dark mode editor, responsive markdown editor",
+  "author": "Varun Nishad",
+  "version": "2.0.0",
   "requestFramePermissions": []
 }
