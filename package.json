@@ -2,6 +2,7 @@
   "name": "markpdf-pro",
   "private": true,
   "version": "0.0.0",
+  "description": "A professional, distraction-free Markdown to PDF converter built with React, Shadcn UI, and Tailwind CSS. Features real-time preview and client-side privacy.",
   "type": "module",
   "scripts": {
     "dev": "vite",
