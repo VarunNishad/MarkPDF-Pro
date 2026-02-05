@@ -4,6 +4,7 @@ import DocumentPreview from './components/DocumentPreview';
 import { DEFAULT_MARKDOWN } from './constants';
 import { Button } from "@/components/ui/button";
 import { Printer, FileText } from "lucide-react";
+import { Analytics } from "@vercel/analytics/react";
 
 const App = () => {
   const [markdown, setMarkdown] = useState<string>(DEFAULT_MARKDOWN);
@@ -149,6 +150,7 @@ const App = () => {
           </div>
         </div>
       </main>
+      <Analytics />
     </div>
   );
 };
