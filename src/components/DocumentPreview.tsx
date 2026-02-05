@@ -63,24 +63,24 @@ const MarkdownComponents: object = {
 const DocumentPreview = forwardRef<HTMLDivElement, DocumentPreviewProps>(({ content }, ref) => {
   return (
     <Card className="h-full flex flex-col border-border shadow-sm bg-muted/20">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-4 bg-background border-b border-border">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <FileText className="h-4 w-4 text-primary" />
-          Live Preview
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 p-3 sm:p-4 bg-background border-b border-border">
+        <CardTitle className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+          <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+          <span className="hidden xs:inline">Live</span> Preview
         </CardTitle>
-        <span className="text-[10px] font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
+        <span className="text-[9px] sm:text-[10px] font-medium text-green-600 bg-green-50 px-1.5 sm:px-2 py-0.5 rounded-full border border-green-200">
           Rendered
         </span>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar relative">
+      <CardContent className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-8 custom-scrollbar relative">
         {/* The actual A4-like page container */}
         <div
           ref={ref}
-          className="bg-white shadow-lg w-full max-w-[210mm] min-h-[297mm] p-[15mm] md:p-[20mm] mx-auto box-border"
+          className="bg-white shadow-lg w-full max-w-[210mm] min-h-[200mm] sm:min-h-[297mm] p-4 sm:p-[15mm] md:p-[20mm] mx-auto box-border"
           id="document-preview-content"
         >
-          <div className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground">
+          <div className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-sm sm:prose-base">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={MarkdownComponents}

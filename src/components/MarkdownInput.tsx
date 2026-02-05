@@ -35,10 +35,10 @@ const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange }) => {
 
   return (
     <Card className="h-full flex flex-col border-border shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-4">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <FileCode className="h-4 w-4" />
-          Markdown Source
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 p-3 sm:p-4">
+        <CardTitle className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+          <FileCode className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <span className="hidden xs:inline">Markdown</span> Source
         </CardTitle>
         <div className="flex items-center gap-2">
           <input
@@ -52,16 +52,17 @@ const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange }) => {
             variant="outline"
             size="sm"
             onClick={handleUploadClick}
-            className="h-8 gap-1.5 text-xs"
+            className="h-7 sm:h-8 gap-1 sm:gap-1.5 text-[10px] sm:text-xs px-2 sm:px-3"
           >
-            <Upload className="h-3.5 w-3.5" />
-            Import File
+            <Upload className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            <span className="hidden xs:inline">Import</span>
+            <span className="xs:hidden">Import</span>
           </Button>
         </div>
       </CardHeader>
       <CardContent className="flex-1 p-0 relative">
         <Textarea
-          className="h-full w-full resize-none border-0 focus-visible:ring-0 rounded-none p-4 font-mono text-sm leading-relaxed"
+          className="h-full w-full resize-none border-0 focus-visible:ring-0 rounded-none p-3 sm:p-4 font-mono text-xs sm:text-sm leading-relaxed"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Enter your markdown here or import a file..."

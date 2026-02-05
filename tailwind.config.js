@@ -5,7 +5,11 @@ export default {
         "./src/**/*.{ts,tsx,js,jsx}"
     ],
     theme: {
-        extend: {},
+        extend: {
+            screens: {
+                'xs': '480px',
+            },
+        },
     },
     plugins: [
         require('@tailwindcss/typography'),

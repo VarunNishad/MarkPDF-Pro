@@ -9,7 +9,7 @@ const App = () => {
   const [markdown, setMarkdown] = useState<string>(DEFAULT_MARKDOWN);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
+    return saved !== null ? JSON.parse(saved) : true;
   });
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -124,50 +124,52 @@ const App = () => {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
       <header className="bg-background border-b border-border sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary p-2 rounded-lg text-primary-foreground">
-              <FileText className="h-5 w-5" />
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="bg-primary p-1.5 sm:p-2 rounded-lg text-primary-foreground">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">MarkPDF Pro</h1>
-              <p className="text-xs text-muted-foreground font-medium">Markdown to PDF Converter</p>
+              <h1 className="text-base sm:text-xl font-bold tracking-tight">MarkPDF Pro</h1>
+              <p className="text-[10px] sm:text-xs text-muted-foreground font-medium hidden xs:block">Markdown to PDF Converter</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               onClick={toggleDarkMode}
               variant="outline"
-              className="gap-2 rounded-full shadow-sm"
+              size="sm"
+              className="gap-1.5 sm:gap-2 rounded-full shadow-sm h-8 sm:h-9 px-2.5 sm:px-4"
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
+              <span className="hidden sm:inline">{darkMode ? "Light Mode" : "Dark Mode"}</span>
             </Button>
             <Button
               onClick={handlePrint}
               variant="outline"
-              className="gap-2 rounded-full shadow-sm"
+              size="sm"
+              className="gap-1.5 sm:gap-2 rounded-full shadow-sm h-8 sm:h-9 px-2.5 sm:px-4"
               title="Print or Save as PDF via Browser"
             >
               <Printer className="h-4 w-4" />
-              <span>Print</span>
+              <span className="hidden sm:inline">Print</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-full mx-auto w-full p-4 lg:p-6 overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-8rem)]">
-          <div className="h-full min-h-[500px]">
+      <main className="flex-1 max-w-full mx-auto w-full p-2 sm:p-4 lg:p-6 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 h-[calc(100vh-4.5rem)] sm:h-[calc(100vh-6rem)] lg:h-[calc(100vh-8rem)]">
+          <div className="h-full min-h-[250px] sm:min-h-[350px] lg:min-h-[500px]">
             <MarkdownInput
               value={markdown}
               onChange={setMarkdown}
             />
           </div>
 
-          <div className="h-full min-h-[500px]">
+          <div className="h-full min-h-[250px] sm:min-h-[350px] lg:min-h-[500px]">
             <DocumentPreview
               ref={previewRef}
               content={markdown}
