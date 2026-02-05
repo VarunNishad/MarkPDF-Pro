@@ -9,7 +9,7 @@
 
 **MarkPDF Pro** is a professional, distraction-free Markdown editor and PDF converter. Built with performance and privacy in mind, it allows you to write markdown and instantly preview it, then export clean, print-ready PDFs directly from your browser.
 
-🌐 **[Try it Live](https://varunnishad.github.io/MarkPDF-Pro/)**
+🌐 **[Try it Live](https://mark-pdf-pro.vercel.app/)**
 
 ---
 
