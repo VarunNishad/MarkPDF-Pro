@@ -1,13 +1,30 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import MarkdownInput from './components/MarkdownInput';
 import DocumentPreview from './components/DocumentPreview';
 import { DEFAULT_MARKDOWN } from './constants';
 import { Button } from "@/components/ui/button";
-import { Printer, FileText } from "lucide-react";
+import { Printer, FileText, Sun, Moon } from "lucide-react";
 
 const App = () => {
   const [markdown, setMarkdown] = useState<string>(DEFAULT_MARKDOWN);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
   const previewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+  };
 
   const handlePrint = () => {
     const previewElement = previewRef.current;
@@ -105,7 +122,7 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-col font-sans">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
       <header className="bg-background border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -119,6 +136,15 @@ const App = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <Button
+              onClick={toggleDarkMode}
+              variant="outline"
+              className="gap-2 rounded-full shadow-sm"
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
+            </Button>
             <Button
               onClick={handlePrint}
               variant="outline"
