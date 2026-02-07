@@ -1,9 +1,29 @@
 {
   "name": "markpdf-pro",
   "private": true,
-  "version": "0.0.0",
-  "description": "A professional, distraction-free Markdown to PDF converter built with React, Shadcn UI, and Tailwind CSS. Features real-time preview and client-side privacy.",
+  "version": "2.1.0",
+  "description": "A professional Markdown to PDF & DOCX converter with real-time preview, dark mode, and responsive design. Built with React, Shadcn UI, and Tailwind CSS. 100% client-side privacy.",
   "type": "module",
+  "author": "Varun Nishad",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VarunNishad/MarkPDF-Pro.git"
+  },
+  "keywords": [
+    "markdown",
+    "pdf",
+    "docx",
+    "converter",
+    "editor",
+    "react",
+    "tailwindcss",
+    "shadcn-ui",
+    "word",
+    "export",
+    "dark-mode",
+    "responsive"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -15,6 +35,8 @@
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "docx": "^9.5.1",
+    "file-saver": "^2.0.5",
     "lucide-react": "^0.563.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -25,6 +47,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.24",

@@ -7,7 +7,11 @@
 ![Mobile Friendly](https://img.shields.io/badge/mobile-friendly-green.svg)
 ![Dark Mode](https://img.shields.io/badge/dark%20mode-supported-blueviolet.svg)
 
-**MarkPDF Pro** is a professional, distraction-free Markdown editor and PDF converter. Built with performance and privacy in mind, it allows you to write markdown and instantly preview it, then export clean, print-ready PDFs directly from your browser.
+**MarkPDF Pro** is a professional, distraction-free Markdown editor and PDF/DOCX converter. Built with performance and privacy in mind, it allows you to write markdown and instantly preview it, then export clean, print-ready PDFs or Word documents directly from your browser.
+
+🌐 **[Try it Live](https://mark-pdf-pro.vercel.app/)**
+
+---
 
 🌐 **[Try it Live](https://mark-pdf-pro.vercel.app/)**
 
@@ -17,7 +21,8 @@
 
 ### Core Features
 * **⚡ Real-time Live Preview**: Type on the left, see the formatted document on the right instantly.
-* **📄 Print-Optimized Export**: Generates perfectly formatted A4 PDFs using the browser's native print engine. No watermarks, no distortions.
+* **📄 Print-Optimized PDF Export**: Generates perfectly formatted A4 PDFs using the browser's native print engine. No watermarks, no distortions.
+* **📝 DOCX Export**: Export to Microsoft Word format (.docx) compatible with MS Word, Google Docs, and LibreOffice. Tables render correctly across all platforms.
 * **🔒 Privacy First**: 100% Client-side. Your data never leaves your browser. No servers, no tracking.
 * **📝 GitHub Flavored Markdown**: Supports tables, code blocks, lists, and standard markdown syntax via `remark-gfm`.
 
@@ -94,6 +99,16 @@ Follow these instructions to set up the project locally on your machine.
 * On mobile, the button shows only the sun/moon icon to save space.
 * Your preference is automatically saved.
 
+### Exporting to DOCX (Word Document)
+
+1. Click the **DOCX** button in the top-right corner of the header.
+2. The file will automatically download with a smart filename based on your document's first heading.
+3. Open the downloaded `.docx` file in:
+    * Microsoft Word
+    * Google Docs
+    * LibreOffice Writer
+    * Any DOCX-compatible application
+
 ### Exporting to PDF
 
 1. Click the **Print** button located in the top-right corner of the header.
@@ -124,7 +139,26 @@ This project is built using the latest modern web technologies:
 | **UI Components** | [Shadcn UI](https://ui.shadcn.com/) (based on Radix UI) |
 | **Icons** | [Lucide React](https://lucide.dev/) |
 | **Markdown Engine** | [react-markdown](https://github.com/remarkjs/react-markdown) + [remark-gfm](https://github.com/remarkjs/remark-gfm) |
+| **DOCX Generation** | [docx](https://docx.js.org/) + [file-saver](https://github.com/eligrey/FileSaver.js) |
 | **State Management** | React useState + localStorage |
+
+---
+
+## 📋 Supported Markdown Features
+
+| Feature | Syntax | DOCX | PDF |
+|---------|--------|------|-----|
+| Headings | `# H1` to `###### H6` | ✅ | ✅ |
+| Bold | `**text**` | ✅ | ✅ |
+| Italic | `*text*` | ✅ | ✅ |
+| Links | `[text](url)` | ✅ | ✅ |
+| Inline Code | `` `code` `` | ✅ | ✅ |
+| Code Blocks | ` ``` ` | ✅ | ✅ |
+| Unordered Lists | `- item` | ✅ | ✅ |
+| Ordered Lists | `1. item` | ✅ | ✅ |
+| Blockquotes | `> quote` | ✅ | ✅ |
+| Tables | `\| col \|` | ✅ | ✅ |
+| Horizontal Rules | `---` | ✅ | ✅ |
 
 ---
 
@@ -140,6 +174,12 @@ This project is built using the latest modern web technologies:
 ---
 
 ## 🔄 Recent Updates
+
+### Version 2.1.0 (February 2026)
+- ✅ Added **DOCX Export** with full MS Word, Google Docs, and LibreOffice compatibility
+- ✅ Tables render correctly in all word processors using explicit column widths
+- ✅ Smart filename generation from document's first heading
+- ✅ Full markdown support: headings, bold, italic, code, lists, tables, blockquotes, links
 
 ### Version 2.0.0 (February 2026)
 - ✅ Added **Dark Mode / Light Mode** toggle with persistence
@@ -180,7 +220,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 🔗 Links
 
-* **Live Demo**: [https://varunnishad.github.io/MarkPDF-Pro/](https://varunnishad.github.io/MarkPDF-Pro/)
+* **Live Demo**: [https://mark-pdf-pro.vercel.app/](https://mark-pdf-pro.vercel.app/)
 * **Repository**: [https://github.com/VarunNishad/MarkPDF-Pro](https://github.com/VarunNishad/MarkPDF-Pro)
 * **Issues**: [https://github.com/VarunNishad/MarkPDF-Pro/issues](https://github.com/VarunNishad/MarkPDF-Pro/issues)
 
