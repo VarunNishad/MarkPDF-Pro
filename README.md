@@ -13,10 +13,6 @@
 
 ---
 
-🌐 **[Try it Live](https://mark-pdf-pro.vercel.app/)**
-
----
-
 ## ✨ Key Features
 
 ### Core Features
@@ -227,13 +223,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ---
 
 **Made with ❤️ by [Varun Nishad](https://github.com/VarunNishad)**
-
-> **MIT License**
->
-> Copyright (c) 2024 Varun Nishad
->
-> Permission is hereby granted, free of charge, to any person obtaining a copy of this software... (Standard MIT text implies adoption).
-
----
-
-Built with ❤️ by [Varun Nishad](https://github.com/VarunNishad)
