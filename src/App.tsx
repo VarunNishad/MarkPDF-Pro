@@ -3,7 +3,15 @@ import MarkdownInput from './components/MarkdownInput';
 import DocumentPreview from './components/DocumentPreview';
 import { DEFAULT_MARKDOWN } from './constants';
 import { Button } from "@/components/ui/button";
-import { Printer, FileText, FileDown, Sun, Moon } from "lucide-react";
+import { Printer, FileText, FileDown, Sun, Moon, ShieldAlert } from "lucide-react";
+import {
+  isRateLimited,
+  enforceInputLimit,
+  sanitizeMarkdown,
+  detectBot,
+  safeLocalStorageSet,
+  safeLocalStorageGet,
+} from './lib/security';
 import { 
   Document, 
   Packer, 
@@ -28,20 +36,30 @@ type SaveStatus = 'idle' | 'saving' | 'saved';
 
 const App = () => {
   const [markdown, setMarkdown] = useState<string>(() => {
-    try {
-      const saved = localStorage.getItem(AUTOSAVE_KEY);
-      return saved !== null ? saved : DEFAULT_MARKDOWN;
-    } catch {
-      return DEFAULT_MARKDOWN;
-    }
+    const saved = safeLocalStorageGet(AUTOSAVE_KEY);
+    return saved !== null ? saved : DEFAULT_MARKDOWN;
   });
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [botWarning, setBotWarning] = useState<boolean>(false);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved !== null ? JSON.parse(saved) : true;
+    try {
+      const saved = safeLocalStorageGet('darkMode');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
   });
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Bot detection on mount
+  useEffect(() => {
+    const { isBot, reasons } = detectBot();
+    if (isBot) {
+      console.warn('Bot/automation detected:', reasons);
+      setBotWarning(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (darkMode) {
@@ -49,7 +67,7 @@ const App = () => {
     } else {
       document.documentElement.classList.remove('dark');
     }
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    safeLocalStorageSet('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
   // Auto-save to localStorage with debounce
@@ -61,30 +79,54 @@ const App = () => {
     }
     setSaveStatus('saving');
     const timer = setTimeout(() => {
-      try {
-        localStorage.setItem(AUTOSAVE_KEY, markdown);
-        setSaveStatus('saved');
-      } catch {
-        setSaveStatus('idle');
+      const success = safeLocalStorageSet(AUTOSAVE_KEY, markdown);
+      setSaveStatus(success ? 'saved' : 'idle');
+      // Reset status after 2 seconds so indicator disappears
+      if (success) {
+        setTimeout(() => setSaveStatus('idle'), 2000);
       }
     }, AUTOSAVE_DELAY);
     return () => clearTimeout(timer);
   }, [markdown]);
 
+  // Secure markdown setter with input size limit and XSS sanitization
+  const handleMarkdownChange = useCallback((value: string) => {
+    const { text, wasTruncated } = enforceInputLimit(value);
+    const sanitized = sanitizeMarkdown(text);
+    if (wasTruncated) {
+      alert('Input was too large and has been truncated to prevent performance issues.');
+    }
+    setMarkdown(sanitized);
+  }, []);
+
   const toggleDarkMode = () => {
     setDarkMode((prev) => !prev);
   };
 
+  const printIframeRef = useRef<HTMLIFrameElement | null>(null);
+
   const handlePrint = () => {
+    // Rate limit: max 3 prints per 30 seconds
+    if (isRateLimited('print', 3, 30_000)) {
+      alert('Please wait a moment before printing again.');
+      return;
+    }
+
     const previewElement = previewRef.current;
     if (!previewElement) {
       alert('Preview not ready.');
       return;
     }
 
+    // Clean up any existing print iframe to prevent memory leaks
+    if (printIframeRef.current && document.body.contains(printIframeRef.current)) {
+      document.body.removeChild(printIframeRef.current);
+    }
+
     // Create a hidden iframe for printing
     // This isolates the content from the app UI and layout styles
     const iframe = document.createElement('iframe');
+    printIframeRef.current = iframe;
     iframe.style.position = 'fixed';
     iframe.style.right = '0';
     iframe.style.bottom = '0';
@@ -108,7 +150,6 @@ const App = () => {
         <head>
           <meta charset="UTF-8" />
           <title>Print Document</title>
-          <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
           <style>
             body { 
@@ -116,8 +157,29 @@ const App = () => {
               background: white;
               margin: 0;
               padding: 0;
+              color: #1a1a1a;
+              line-height: 1.7;
             }
             h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+            h1 { font-size: 2.25rem; font-weight: 700; color: #111827; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb; }
+            h2 { font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-top: 2rem; margin-bottom: 1rem; }
+            h3 { font-size: 1.25rem; font-weight: 600; color: #1f2937; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+            h4 { font-size: 1.125rem; font-weight: 600; color: #374151; margin-top: 1rem; margin-bottom: 0.5rem; }
+            p { color: #374151; margin-bottom: 1rem; }
+            ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+            ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+            li { padding-left: 0.25rem; margin-bottom: 0.25rem; }
+            blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; margin: 1.5rem 0; background: #eff6ff; padding: 0.5rem 1rem; border-radius: 0 0.25rem 0.25rem 0; font-style: italic; }
+            pre { background: #111827; color: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1.5rem; font-size: 0.875rem; }
+            code { font-family: 'Consolas', 'Monaco', monospace; }
+            :not(pre) > code { background: #f3f4f6; color: #db2777; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem; border: 1px solid #e5e7eb; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.875rem; }
+            th, td { padding: 0.75rem 1rem; border: 1px solid #e5e7eb; text-align: left; }
+            th { background: #f9fafb; font-weight: 600; color: #374151; }
+            td { color: #4b5563; }
+            hr { margin: 2rem 0; border: none; border-top: 1px solid #e5e7eb; }
+            a { color: #2563eb; text-decoration: underline; }
+            img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1.5rem auto; display: block; }
             
             /* Print settings */
             @page { 
@@ -126,25 +188,19 @@ const App = () => {
             }
 
             /* Ensure elements don't break awkwardly across pages */
-            .break-inside-avoid { break-inside: avoid; page-break-inside: avoid; }
-            img { max-width: 100%; height: auto; break-inside: avoid; page-break-inside: avoid; }
-            tr { break-inside: avoid; page-break-inside: avoid; }
-            
-            /* Ensure typography fills the width */
-            .prose { max-width: none !important; }
+            h1, h2, h3, h4, h5, h6, p, li, tr, img, blockquote, pre { break-inside: avoid; page-break-inside: avoid; }
             
             /* Hide any UI artifacts if they slipped in */
             ::-webkit-scrollbar { display: none; }
           </style>
         </head>
         <body>
-          <div class="p-4">
+          <div style="padding: 1rem;">
             ${contentHtml}
           </div>
           <script>
-            // Wait for Tailwind CDN and fonts to load
+            // Wait for fonts to load
             window.onload = function() {
-              // Add a small delay for style computation
               setTimeout(function() {
                 try {
                   window.focus();
@@ -161,16 +217,23 @@ const App = () => {
     doc.close();
 
     // Clean up the iframe after enough time for the print dialog to register
-    // Note: If the user cancels print quickly, this removes the iframe correctly.
-    // If they keep it open, the iframe removal doesn't affect the open dialog in most modern browsers.
     setTimeout(() => {
       if (document.body.contains(iframe)) {
         document.body.removeChild(iframe);
       }
-    }, 5000);
+      if (printIframeRef.current === iframe) {
+        printIframeRef.current = null;
+      }
+    }, 10000);
   };
 
   const handleExportDocx = async () => {
+    // Rate limit: max 3 exports per 30 seconds
+    if (isRateLimited('docx-export', 3, 30_000)) {
+      alert('Please wait a moment before exporting again.');
+      return;
+    }
+
     if (!markdown.trim()) {
       alert('Please add some content before exporting.');
       return;
@@ -475,27 +538,11 @@ const App = () => {
   // Parse inline formatting (bold, italic, code, links)
   const parseInlineFormatting = (text: string): (TextRun | ExternalHyperlink)[] => {
     const runs: (TextRun | ExternalHyperlink)[] = [];
-    
-    // Regex patterns for inline formatting
-    const patterns = [
-      { regex: /\*\*\*(.+?)\*\*\*/g, bold: true, italics: true },
-      { regex: /\*\*(.+?)\*\*/g, bold: true, italics: false },
-      { regex: /\*(.+?)\*/g, bold: false, italics: true },
-      { regex: /__(.+?)__/g, bold: true, italics: false },
-      { regex: /_(.+?)_/g, bold: false, italics: true },
-      { regex: /`(.+?)`/g, code: true },
-      { regex: /\[(.+?)\]\((.+?)\)/g, link: true },
-    ];
-
-    // Simple approach: process text sequentially
-    let remaining = text;
-    let lastIndex = 0;
 
     // Combined regex to find all special patterns
     const combinedRegex = /(\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|\*(.+?)\*|__(.+?)__|_([^_]+)_|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\))/g;
     
     let match;
-    let processedText = '';
     let segments: { text: string; bold?: boolean; italics?: boolean; code?: boolean; link?: string }[] = [];
     let currentIndex = 0;
 
@@ -570,6 +617,20 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
+      {/* Bot detection warning banner */}
+      {botWarning && (
+        <div className="bg-amber-500 text-amber-950 px-4 py-2 text-xs sm:text-sm font-medium flex items-center justify-center gap-2">
+          <ShieldAlert className="h-4 w-4 shrink-0" />
+          <span>Automated browser detected. Some features may be restricted.</span>
+          <button
+            onClick={() => setBotWarning(false)}
+            className="ml-2 underline font-semibold hover:no-underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       <header className="bg-background border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -623,7 +684,7 @@ const App = () => {
           <div className="h-full min-h-[250px] sm:min-h-[350px] lg:min-h-[500px]">
             <MarkdownInput
               value={markdown}
-              onChange={setMarkdown}
+              onChange={handleMarkdownChange}
               saveStatus={saveStatus}
             />
           </div>

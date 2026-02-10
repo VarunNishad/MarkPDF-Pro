@@ -1,8 +1,9 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FileCode, Upload } from "lucide-react";
+import { isPasteBomb, MAX_PASTE_LENGTH } from '@/lib/security';
 
 interface MarkdownInputProps {
   value: string;
@@ -21,9 +22,17 @@ const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange, saveStat
     return { words, readingTime };
   }, [value]);
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum allowed size is 5 MB.`);
+      e.target.value = '';
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -31,6 +40,9 @@ const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange, saveStat
       if (content) {
         onChange(content);
       }
+    };
+    reader.onerror = () => {
+      alert('Failed to read file. Please try again.');
     };
     reader.readAsText(file);
 
@@ -41,6 +53,14 @@ const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange, saveStat
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
+
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const pastedText = e.clipboardData.getData('text');
+    if (isPasteBomb(pastedText)) {
+      e.preventDefault();
+      alert(`Pasted content is too large (${(pastedText.length / 1024).toFixed(0)} KB). Maximum paste size is ${MAX_PASTE_LENGTH / 1000} KB.`);
+    }
+  }, []);
 
   return (
     <Card className="h-full flex flex-col border-border shadow-sm">
@@ -82,6 +102,7 @@ const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange, saveStat
           className="h-full w-full resize-none border-0 focus-visible:ring-0 rounded-none p-3 sm:p-4 font-mono text-xs sm:text-sm leading-relaxed"
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onPaste={handlePaste}
           placeholder="Enter your markdown here or import a file..."
           spellCheck={false}
         />

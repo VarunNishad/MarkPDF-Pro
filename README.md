@@ -6,6 +6,7 @@
 ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=flat&logo=vite&logoColor=white)
 ![Mobile Friendly](https://img.shields.io/badge/mobile-friendly-green.svg)
 ![Dark Mode](https://img.shields.io/badge/dark%20mode-supported-blueviolet.svg)
+![Security](https://img.shields.io/badge/security-hardened-brightgreen.svg)
 
 **MarkPDF Pro** is a professional, distraction-free Markdown editor and PDF/DOCX converter. Built with performance and privacy in mind, it allows you to write markdown and instantly preview it, then export clean, print-ready PDFs or Word documents directly from your browser.
 
@@ -22,14 +23,24 @@
 * **🔒 Privacy First**: 100% Client-side. Your data never leaves your browser. No servers, no tracking.
 * **📝 GitHub Flavored Markdown**: Supports tables, code blocks, lists, and standard markdown syntax via `remark-gfm`.
 
-### New Features
-* **🌙 Dark Mode / Light Mode Toggle**: Switch between dark and light themes with a single click. Dark mode is enabled by default for comfortable viewing. Your preference is saved automatically.
+### Editor Features
+* **💾 Auto-Save**: Editor content is automatically saved to your browser with a 500ms debounce. Restored on your next visit with a visible save indicator.
+* **📊 Word Count & Reading Time**: Live word count and estimated reading time displayed at the bottom of the editor.
+* **🌙 Dark Mode / Light Mode Toggle**: Switch between dark and light themes with a single click. Dark mode is enabled by default. Your preference is saved automatically.
 * **📱 Fully Responsive Design**: Optimized for all screen sizes:
   - **Mobile phones** (320px+): Compact UI with icon-only buttons
   - **Tablets** (640px+): Balanced layout with partial labels
   - **Desktops** (1024px+): Full-featured side-by-side editor and preview
 * **💾 Persistent Settings**: Your dark mode preference is saved to localStorage and restored on your next visit.
-* **📤 Import Markdown Files**: Upload `.md`, `.markdown`, or `.txt` files directly into the editor.
+* **📤 Import Markdown Files**: Upload `.md`, `.markdown`, or `.txt` files (up to 5 MB) directly into the editor.
+
+### Security & Protection
+* **🛡️ Bot & Automation Detection**: Detects headless browsers (Puppeteer, Playwright, Selenium, PhantomJS, Cypress) and displays a warning banner.
+* **⏱️ Rate Limiting**: Print and DOCX export are rate-limited (3 per 30s) to prevent automated abuse.
+* **🧹 XSS Sanitization**: Dangerous HTML tags, event handlers, `javascript:` URIs, and data URIs are stripped from markdown input.
+* **📏 Input Size Limits**: Editor input capped at 2 MB; paste operations capped at 500 KB; file imports capped at 5 MB.
+* **🔐 Security Headers**: Content-Security-Policy, X-Frame-Options (DENY), HSTS, X-Content-Type-Options, Permissions-Policy, and Referrer-Policy via Vercel.
+* **🚨 Error Boundary**: Graceful crash recovery with "Try Again" and "Clear Data & Reload" options instead of a white screen.
 
 ### UI/UX Improvements
 * **🎨 Modern UI**: Crafted with [Shadcn UI](https://ui.shadcn.com/) and [Tailwind CSS v4](https://tailwindcss.com/) for a sleek, responsive experience.
@@ -137,6 +148,7 @@ This project is built using the latest modern web technologies:
 | **Markdown Engine** | [react-markdown](https://github.com/remarkjs/react-markdown) + [remark-gfm](https://github.com/remarkjs/remark-gfm) |
 | **DOCX Generation** | [docx](https://docx.js.org/) + [file-saver](https://github.com/eligrey/FileSaver.js) |
 | **State Management** | React useState + localStorage |
+| **Security** | Custom client-side security module + Vercel security headers |
 
 ---
 
@@ -170,6 +182,24 @@ This project is built using the latest modern web technologies:
 ---
 
 ## 🔄 Recent Updates
+
+See [CHANGELOG.md](CHANGELOG.md) for the full changelog.
+
+### Version 2.2.0 (February 2026)
+- ✅ **Auto-save** editor content to localStorage with 500ms debounce and save status indicator
+- ✅ **Word count & reading time** live display in editor footer
+- ✅ **Bot & automation detection** (Puppeteer, Playwright, Selenium, PhantomJS, Cypress)
+- ✅ **Rate limiting** on Print and DOCX export (3 per 30 seconds)
+- ✅ **XSS sanitization** — strips dangerous HTML, event handlers, and `javascript:` URIs
+- ✅ **Input size protection** — 2 MB editor limit, 500 KB paste limit, 5 MB file import limit
+- ✅ **React Error Boundary** — graceful crash recovery UI
+- ✅ **Security headers** via Vercel (CSP, HSTS, X-Frame-Options, Permissions-Policy)
+- 🐛 Fixed darkMode crash on corrupted localStorage
+- 🐛 Fixed save status indicator stuck in "Saved" state
+- 🐛 Fixed print iframe memory leak on rapid clicks
+- 🗑️ Removed API key leak from Vite config
+- 🗑️ Removed external CDN script from print iframe
+- 🗑️ Removed stale import map and dead code
 
 ### Version 2.1.0 (February 2026)
 - ✅ Added **DOCX Export** with full MS Word, Google Docs, and LibreOffice compatibility
