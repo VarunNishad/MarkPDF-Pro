@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,10 +7,19 @@ import { FileCode, Upload } from "lucide-react";
 interface MarkdownInputProps {
   value: string;
   onChange: (value: string) => void;
+  saveStatus: 'idle' | 'saving' | 'saved';
 }
 
-const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange }) => {
+const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange, saveStatus }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const stats = useMemo(() => {
+    const trimmed = value.trim();
+    if (!trimmed) return { words: 0, readingTime: 0 };
+    const words = trimmed.split(/\s+/).filter(w => w.length > 0).length;
+    const readingTime = Math.max(1, Math.ceil(words / 200));
+    return { words, readingTime };
+  }, [value]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,6 +50,14 @@ const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange }) => {
           <span className="hidden xs:inline">Markdown</span> Source
         </CardTitle>
         <div className="flex items-center gap-2">
+          {saveStatus !== 'idle' && (
+            <span className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground">
+              <span className={`inline-block h-1.5 w-1.5 rounded-full ${
+                saveStatus === 'saved' ? 'bg-green-500' : 'bg-amber-500 animate-pulse'
+              }`} />
+              {saveStatus === 'saved' ? 'Saved' : 'Saving...'}
+            </span>
+          )}
           <input
             type="file"
             ref={fileInputRef}
@@ -69,6 +86,11 @@ const MarkdownInput: React.FC<MarkdownInputProps> = ({ value, onChange }) => {
           spellCheck={false}
         />
       </CardContent>
+      <div className="px-3 sm:px-4 py-1.5 sm:py-2 border-t border-border text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1.5">
+        <span>{stats.words} words</span>
+        <span>·</span>
+        <span>{stats.readingTime} min read</span>
+      </div>
     </Card>
   );
 };

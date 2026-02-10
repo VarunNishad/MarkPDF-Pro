@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MarkdownInput from './components/MarkdownInput';
 import DocumentPreview from './components/DocumentPreview';
 import { DEFAULT_MARKDOWN } from './constants';
@@ -21,8 +21,21 @@ import {
 } from 'docx';
 import { saveAs } from 'file-saver';
 
+const AUTOSAVE_KEY = 'markpdf-autosave';
+const AUTOSAVE_DELAY = 500;
+
+type SaveStatus = 'idle' | 'saving' | 'saved';
+
 const App = () => {
-  const [markdown, setMarkdown] = useState<string>(DEFAULT_MARKDOWN);
+  const [markdown, setMarkdown] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem(AUTOSAVE_KEY);
+      return saved !== null ? saved : DEFAULT_MARKDOWN;
+    } catch {
+      return DEFAULT_MARKDOWN;
+    }
+  });
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('darkMode');
@@ -38,6 +51,25 @@ const App = () => {
     }
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
+
+  // Auto-save to localStorage with debounce
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setSaveStatus('saving');
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(AUTOSAVE_KEY, markdown);
+        setSaveStatus('saved');
+      } catch {
+        setSaveStatus('idle');
+      }
+    }, AUTOSAVE_DELAY);
+    return () => clearTimeout(timer);
+  }, [markdown]);
 
   const toggleDarkMode = () => {
     setDarkMode((prev) => !prev);
@@ -592,6 +624,7 @@ const App = () => {
             <MarkdownInput
               value={markdown}
               onChange={setMarkdown}
+              saveStatus={saveStatus}
             />
           </div>
 
